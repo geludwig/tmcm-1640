@@ -6,7 +6,7 @@ https://blog.mbedded.ninja/programming/operating-systems/linux/linux-serial-port
 */
 
 // tmcm headers
-#include "tmc16xx.h"
+#include "tmcm16xx.h"
 
 // C library headers
 #include <stdio.h>
@@ -68,12 +68,12 @@ int main() {
 
     // TMCM command example
     // #############################################################################################################################
-    TMC16XX tmc;
-    TMC16XX();
+    TMCM16XX tmcm;
+    TMCM16XX();
 
-    write(serial_port, tmc.rotateRight(1000), 9);
+    write(serial_port, tmcm.rotateLeft(500), 9);
 
-    const unsigned char* command = tmc.rawByteArray();
+    const unsigned char* command = tmcm.rawByteArray();
     printf("WRITE ------------------------\n");
     printf("0 module address: %i\n", command[0]);
     printf("1 command:        %i\n", command[1]);
