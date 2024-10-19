@@ -27,6 +27,12 @@ void TMCM16XX::calcValueChecksum(int value) {
     cmd[8] = checksum;
 }
 
+// ################################################################################
+// #                                                                              #
+// #                             HIGH LEVEL FUNCTIONS                             #
+// #                                                                              #
+// ################################################################################
+
 /* Initialize TMCM16XX */
 TMCM16XX::TMCM16XX() {
     for (int i = 0; i < 9; i++) {
@@ -36,19 +42,30 @@ TMCM16XX::TMCM16XX() {
     cmd[3] = 0;     // 1 byte: Motor or Bank number
 }
 
-/*  Get current raw byte array.
-    arg: na
-    ret: char[9]
+/*  Get Firmware version.
+    arg:    int type
+    ret:    char[9]
 */
-const unsigned char* TMCM16XX::rawByteArray() const {
+const unsigned char* TMCM16XX::getFirmwareVersion(int type) {
+    cmd[1] = 136;
+    cmd[2] = type;
+    calcValueChecksum(0);
+    return cmd;
+}
+
+/*  Get last command.
+    arg:    na
+    ret:    char[9]
+*/
+const unsigned char* TMCM16XX::getLastCommand() const {
     return cmd;
 }
 
 /*  Rotate Right.
-    arg: int velocity
-    ret: char[9]
+    arg:    int velocity
+    ret:    char[9]
 */
-const unsigned char* TMCM16XX::rotateRight(int value) {
+const unsigned char* TMCM16XX::setRotateRight(int value) {
     cmd[1] = 1;
     cmd[2] = 0;
     calcValueChecksum(value);
@@ -56,10 +73,10 @@ const unsigned char* TMCM16XX::rotateRight(int value) {
 }
 
 /*  Rotate Left.
-    arg: int velocity
-    ret: char[9]
+    arg:    int velocity
+    ret:    char[9]
 */
-const unsigned char* TMCM16XX::rotateLeft(int value) {
+const unsigned char* TMCM16XX::setRotateLeft(int value) {
     cmd[1] = 2;
     cmd[2] = 0;
     calcValueChecksum(value);
@@ -67,10 +84,10 @@ const unsigned char* TMCM16XX::rotateLeft(int value) {
 }
 
 /*  Move Absolute.
-    arg: int position
-    ret: char[9]
+    arg:    int position
+    ret:    char[9]
 */
-const unsigned char* TMCM16XX::moveAbs(int value) {
+const unsigned char* TMCM16XX::setMoveAbs(int value) {
     cmd[1] = 4;
     cmd[2] = 0;
     calcValueChecksum(value);
@@ -78,24 +95,132 @@ const unsigned char* TMCM16XX::moveAbs(int value) {
 }
 
 /*  Move Relative.
-    arg: int offset
-    ret: char[9]
+    arg:    int offset
+    ret:    char[9]
 */
-const unsigned char* TMCM16XX::moveRel(int value) {
+const unsigned char* TMCM16XX::setMoveRel(int value) {
     cmd[1] = 4;
     cmd[2] = 1;
     calcValueChecksum(value);
     return cmd;
 }
 
-/*  Stop.
-    arg: na
-    ret: char[9]
+/*  Stop rotation.
+    arg:    na
+    ret:    char[9]
 */
-const unsigned char* TMCM16XX::stop() {
+const unsigned char* TMCM16XX::setStop() {
     cmd[1] = 3;
     cmd[2] = 0;
-    int value = 0;
+    calcValueChecksum(0);
+    return cmd;
+}
+
+// ################################################################################
+// #                                                                              #
+// #                             PARAMETER FUNCTIONS                              #
+// #                                                                              #
+// ################################################################################
+
+/*  Set Axis Parameter.
+    arg:    int type, int value
+    ret:    char[9]
+*/
+const unsigned char* TMCM16XX::setAxisParameter(int type, int value) {
+    cmd[1] = 5;
+    cmd[2] = type;
     calcValueChecksum(value);
+    return cmd;
+}
+
+/*  Get Axis Parameter.
+    arg:    int type
+    ret:    char[9]
+*/
+const unsigned char* TMCM16XX::getAxisParameter(int type) {
+    cmd[1] = 6;
+    cmd[2] = type;
+    calcValueChecksum(0);
+    return cmd;
+}
+
+/*  Store Axis Parameter previously set.
+    arg:    int type
+    ret:    char[9]
+*/
+const unsigned char* TMCM16XX::saveAxisParameter(int type) {
+    cmd[1] = 7;
+    cmd[2] = type;
+    calcValueChecksum(0);
+    return cmd;
+}
+
+/*  Load Axis Parameter previously set.
+    arg:    int type
+    ret:    char[9]
+*/
+const unsigned char* TMCM16XX::loadAxisParameter(int type) {
+    cmd[1] = 8;
+    cmd[2] = type;
+    calcValueChecksum(0);
+    return cmd;
+}
+
+/*  Set Global Parameter.
+    arg:    int type, int value
+    ret:    char[9]
+*/
+const unsigned char* TMCM16XX::setGlobalParameter(int type, int value) {
+    cmd[1] = 9;
+    cmd[2] = type;
+    calcValueChecksum(value);
+    return cmd;
+}
+
+/*  Get Global Parameter.
+    arg:    int type
+    ret:    char[9]
+*/
+const unsigned char* TMCM16XX::getGlobalParameter(int type) {
+    cmd[1] = 10;
+    cmd[2] = type;
+    calcValueChecksum(0);
+    return cmd;
+}
+
+/*  Store Global Parameter.
+    arg:    int type
+    ret:    char[9]
+*/
+const unsigned char* TMCM16XX::saveGlobalParameter(int type) {
+    cmd[1] = 11;
+    cmd[2] = type;
+    calcValueChecksum(0);
+    return cmd;
+}
+
+/*  Load Global Parameter.
+    arg:    int type
+    ret:    char[9]
+*/
+const unsigned char* TMCM16XX::loadGlobalParameter(int type) {
+    cmd[1] = 12;
+    cmd[2] = type;
+    calcValueChecksum(0);
+    return cmd;
+}
+
+// ################################################################################
+// #                                                                              #
+// #                             CURRENT FUNCTIONS                                #
+// #                                                                              #
+// ################################################################################
+
+/*  Set Max Current.
+    arg:    int value
+    ret:    char[9]
+*/
+const unsigned char* TMCM16XX::setCurrentMax(int value) {
+    setAxisParameter(6, value);
     return cmd;
 }
