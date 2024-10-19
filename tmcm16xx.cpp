@@ -208,11 +208,10 @@ const unsigned char* TMCM16XX::setCurrentMax(int value) {
 }
 
 /*  Get Actual Current.
-    arg:    int value
     ret:    char[9]
 */
-const unsigned char* TMCM16XX::getCurrent(int value) {
-    setAxisParameter(ACTCUR, value);
+const unsigned char* TMCM16XX::getCurrent() {
+    getAxisParameter(ACTCUR);
     return cmd;
 }
 
@@ -253,19 +252,17 @@ const unsigned char* TMCM16XX::setCurrentI(int value) {
 }
 
 /*  Get PID Error.
-    arg:    int value
     ret:    char[9]
 */
-const unsigned char* TMCM16XX::getCurrentPidError(int value) {
-    setAxisParameter(PIDCURERR, value);
+const unsigned char* TMCM16XX::getCurrentPidError() {
+    getAxisParameter(PIDCURERR);
     return cmd;
 }
 
 /*  Get PID Error Sum.
-    arg:    int value
     ret:    char[9]
 */
-const unsigned char* TMCM16XX::getCurrentPidErrorSum(int value) {
-    setAxisParameter(PIDCURERRSUM, value);
+const unsigned char* TMCM16XX::getCurrentPidErrorSum() {
+    getAxisParameter(PIDCURERRSUM);
     return cmd;
 }

@@ -128,12 +128,12 @@ class TMCM16XX {
 
         const unsigned char* setCurrentMax(int value);
         const unsigned char* setCurrent(int value);
-        const unsigned char* getCurrent(int value);
+        const unsigned char* getCurrent();
         const unsigned char* setCurrentPidDelay(int value);
         const unsigned char* setCurrentP(int value);
         const unsigned char* setCurrentI(int value);
-        const unsigned char* getCurrentPidError(int value);
-        const unsigned char* getCurrentPidErrorSum(int value);
+        const unsigned char* getCurrentPidError();
+        const unsigned char* getCurrentPidErrorSum();
 
 
 };
