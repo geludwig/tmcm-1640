@@ -52,7 +52,7 @@ class TMCM16XX {
             MAXRAMPVELOCITY,
             MAXCURRENT = 6,
             TARGETVELOCITYFLAG,
-            MOTORHALTVELOCITYFLAG = 9,
+            VELOCITYHALTFLAG = 9,
             TARGETREACHDISTANCE,
             ACCELERATIONVELOCITY,
             RAMPGENERATORSPEED = 13,
@@ -111,7 +111,7 @@ class TMCM16XX {
 
         const int* decodeReceive(const char*);
 
-        /* High Level Functions */
+        /* Move Functions */
 
         const unsigned char* setRotateRight(int);
         const unsigned char* setRotateLeft(int);
@@ -135,12 +135,26 @@ class TMCM16XX {
         const unsigned char* setCurrentMax(int);
         const unsigned char* setCurrent(int);
         const unsigned char* getCurrent();
-        const unsigned char* setCurrentPidDelay(int);
+        const unsigned char* setCurrentD(int);
         const unsigned char* setCurrentP(int);
         const unsigned char* setCurrentI(int);
-        const unsigned char* getCurrentPidError();
-        const unsigned char* getCurrentPidErrorSum();
+        const unsigned char* getCurrentError();
+        const unsigned char* getCurrentErrorSum();
 
+        /* Velocity Functions */
+
+        const unsigned char* setVelocity(int);
+        const unsigned char* getVelocity();
+        const unsigned char* setVelocityHaltFlag(int);
+        const unsigned char* setVelocityD(int);
+        const unsigned char* setVelocityP(int);
+        const unsigned char* setVelocityI(int);
+        const unsigned char* getVelocityError();
+        const unsigned char* getVelocityErrorSum();
+        const unsigned char* setVelocityRampMax(int);
+        const unsigned char* setVelocityAcceleration(int);
+        const unsigned char* getVelocityRamp();
+        const unsigned char* setVelocityRampEnable(int);
 };
 
 #endif

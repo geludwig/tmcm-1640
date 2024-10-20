@@ -4,17 +4,6 @@
 #include "tmcm16xx.h"
 #include <stdio.h>
 
-/*
-cmd[0] = 0;                     // 1 byte: Module address
-cmd[1] = 1;                     // 1 byte: Command number
-cmd[2] = 0;                     // 1 byte: Type number
-cmd[3] = 0;                     // 1 byte: Motor or Bank number
-cmd[4] = (value >> 24) & 0xFF;  // 4 bytes value, MSB first
-cmd[5] = (value >> 16) & 0xFF;
-cmd[6] = (value >> 8) & 0xFF;
-cmd[7] = value & 0xFF;
-*/
-
 // ################################################################################
 // #                                                                              #
 // #                              PRIVATE FUNCTIONS                               #
@@ -44,7 +33,7 @@ void TMCM16XX::calcValueChecksum(int value) {
 
 /*  Decode Receive Message.
     arg: unsigned char[9]
-    ret: signed char[5]
+    ret: signed char[5] = {receive address, module address, status, command, value}
 */
 const int* TMCM16XX::decodeReceive(const char *value) {    
     /* calc checksum */
@@ -83,7 +72,7 @@ const int* TMCM16XX::decodeReceive(const char *value) {
 
 // ################################################################################
 // #                                                                              #
-// #                             HIGH LEVEL FUNCTIONS                             #
+// #                                MOVE FUNCTIONS                                #
 // #                                                                              #
 // ################################################################################
 
@@ -272,11 +261,11 @@ const unsigned char* TMCM16XX::setCurrent(int value) {
     return cmd;
 }
 
-/*  Set PID Current Delay.
+/*  Set PID Current D Parameter.
     arg:    int value
     ret:    unsigned char[9]
 */
-const unsigned char* TMCM16XX::setCurrentPidDelay(int value) {
+const unsigned char* TMCM16XX::setCurrentD(int value) {
     setAxisParameter(DCURRENT, value);
     return cmd;
 }
@@ -302,7 +291,7 @@ const unsigned char* TMCM16XX::setCurrentI(int value) {
 /*  Get PID Error.
     ret:    unsigned char[9]
 */
-const unsigned char* TMCM16XX::getCurrentPidError() {
+const unsigned char* TMCM16XX::getCurrentError() {
     getAxisParameter(PIDCURRENTERROR);
     return cmd;
 }
@@ -310,7 +299,118 @@ const unsigned char* TMCM16XX::getCurrentPidError() {
 /*  Get PID Error Sum.
     ret:    unsigned char[9]
 */
-const unsigned char* TMCM16XX::getCurrentPidErrorSum() {
+const unsigned char* TMCM16XX::getCurrentErrorSum() {
     getAxisParameter(PIDCURRENTERRORSUM);
     return cmd;
 }
+
+// ################################################################################
+// #                                                                              #
+// #                            VELOCITY FUNCTIONS                                #
+// #                                                                              #
+// ################################################################################
+
+/*  Set Target Velocity.
+    arg:    int value
+    ret:    unsigned char[9]
+*/
+const unsigned char* TMCM16XX::setVelocity(int value) {
+    setAxisParameter(TARGETVELOCITY, value);
+    return cmd;
+}
+
+/*  Get Actual Velocity.
+    ret:    unsigned char[9]
+*/
+const unsigned char* TMCM16XX::getVelocity() {
+    getAxisParameter(ACTUALVELOCITY);
+    return cmd;
+}
+
+/*  Set Velocity Stall Flag RPM.
+    arg:    int value
+    ret:    unsigned char[9]
+*/
+const unsigned char* TMCM16XX::setVelocityHaltFlag(int value) {
+    setAxisParameter(VELOCITYHALTFLAG, value);
+    return cmd;
+}
+
+/*  Set PID Current D Parameter.
+    arg:    int value
+    ret:    unsigned char[9]
+*/
+const unsigned char* TMCM16XX::setVelocityD(int value) {
+    setAxisParameter(DVELOCITY, value);
+    return cmd;
+}
+
+/*  Set PID Current P Parameter.
+    arg:    int value
+    ret:    unsigned char[9]
+*/
+const unsigned char* TMCM16XX::setVelocityP(int value) {
+    setAxisParameter(PVELOCITY, value);
+    return cmd;
+}
+
+/*  Set PID Current I Parameter.
+    arg:    int value
+    ret:    unsigned char[9]
+*/
+const unsigned char* TMCM16XX::setVelocityI(int value) {
+    setAxisParameter(IVELOCITY, value);
+    return cmd;
+}
+
+/*  Get Velocity PID Error.
+    ret:    unsigned char[9]
+*/
+const unsigned char* TMCM16XX::getVelocityError() {
+    getAxisParameter(PIDVELOCITYERROR);
+    return cmd;
+}
+
+/*  Get Velocity PID Error Sum.
+    ret:    unsigned char[9]
+*/
+const unsigned char* TMCM16XX::getVelocityErrorSum() {
+    getAxisParameter(PIDVELOCITYERRORSUM);
+    return cmd;
+}
+
+/*  Set Velocity Max Ramp.
+    arg:    int value
+    ret:    unsigned char[9]
+*/
+const unsigned char* TMCM16XX::setVelocityRampMax(int value) {
+    setAxisParameter(MAXRAMPVELOCITY, value);
+    return cmd;
+}
+
+/*  Set Velocity Acceleration.
+    arg:    int value
+    ret:    unsigned char[9]
+*/
+const unsigned char* TMCM16XX::setVelocityAcceleration(int value) {
+    setAxisParameter(ACCELERATIONVELOCITY, value);
+    return cmd;
+}
+
+/*  Get Velocity Actual Ramp Rpm.
+    ret:    unsigned char[9]
+*/
+const unsigned char* TMCM16XX::getVelocityRamp() {
+    getAxisParameter(RAMPGENERATORSPEED);
+    return cmd;
+}
+
+/*  Enable Velocity Ramp.
+    arg:    int value = {0 or 1}
+    ret:    unsigned char[9]
+*/
+const unsigned char* TMCM16XX::setVelocityRampEnable(int value) {
+    setAxisParameter(ENABLEVELOCITYRAMP, value);
+    return cmd;
+}
+
