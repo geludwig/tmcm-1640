@@ -4,8 +4,10 @@
 class TMCM16XX {
     private:
         unsigned char cmd[9];
+        int rec[9];
         void calcValueChecksum(int value);
 
+    public:
         /* Command list */
         enum command {
             ROR = 1,
@@ -43,98 +45,101 @@ class TMCM16XX {
 
         /* Type list for SAP, GAP, STAP, RSAP, AAP commands */
         enum parameter {
-            TARPOS,
-            ACTPOS,
-            TARSPEED,
-            ACTSPEED,
-            MAXRAMPVEL,
-            MAXCUR = 6,
-            TARREACHVEL,
-            MOTORHALTVEL = 9,
-            TARREACHDIST,
-            ACCVEL,
-            RAMPSPEED = 13,
-            THERMWINDTIME = 25,
-            I2TLIM,
+            TARGETPOS,
+            ACTUALPOS,
+            TARGETVELOCITY,
+            ACTUALVELOCITY,
+            MAXRAMPVELOCITY,
+            MAXCURRENT = 6,
+            TARGETVELOCITYFLAG,
+            MOTORHALTVELOCITYFLAG = 9,
+            TARGETREACHDISTANCE,
+            ACCELERATIONVELOCITY,
+            RAMPGENERATORSPEED = 13,
+            THERMALWINDINGTIME = 25,
+            I2TLIMIT,
             I2TSUM,
-            I2TEXCEEDCOUNT,
+            I2TEXCEEDCOUNTER,
             I2TCLEARFLAG,
-            RUNMIN,
-            BLDCRST,
-            PIDDELAY = 133,
-            PIDCURRENTDELAY,
-            ENVELRAMP = 146,
-            ACTCUR = 150,
-            SUPVOLTAGE,
+            MINUTECOUNTER,
+            BLDCINIT,
+            DVELOCITY = 133,
+            DCURRENT,
+            ENABLEVELOCITYRAMP = 146,
+            ACTUALCURRENT = 150,
+            SUPPLYVOLTAGE,
             TEMP,
-            TARCUR = 155,
-            ERRFLAGS,
-            COMMUTATION = 159,
-            ENCSETNULL = 161,
-            SWSETNULL,
-            ENCCLEAR,
-            STOPSW,
-            ENCOFFSET,
-            STOPSWPOL,
-            PCUR = 172,
-            ICUR,
-            STARTCUR = 177,
-            PIDCURERR = 200,
-            PIDCURERRSUM,
+            TARGETCURRENT = 155,
+            ERRORFLAGS,
+            COMMUTATIONMODE = 159,
+            ENCODERSETNULL = 161,
+            SWITCHSETNULL,
+            ENCODERCLEAR,
+            STOPSWITCH,
+            ENCODEROFFSET,
+            STOPSWITCHPOLARITY,
+            PCURRENT = 172,
+            ICURRENT,
+            STARTCURRENT = 177,
+            PIDCURRENTERROR = 200,
+            PIDCURRENTERRORSUM,
             HALLANGLE = 210,
-            ENCANGLE,
+            ENCODERANGLE,
             CONTROLANGLE,
-            PIDPOSERR = 226,
-            PIDVELERR = 228,
-            PIDVELERRSUM,
-            PPOS,
-            PVEL = 234,
-            IVEL,
+            PIDPOSITIONERROR = 226,
+            PIDVELOCITYERROR = 228,
+            PIDVELOCITYERRORSUM,
+            PPOSITION,
+            PVELOCITY = 234,
+            IVELOCITY,
             SINEINITSPEED = 241,
             SINEINITDELAY = 244,
             OVERVOLTAGEPROT,
             INITSINEMODE = 249,
-            ENCSTEPS,
-            ENCDIR,
+            ENCODERSTEPS,
+            ENCODERDIR,
             MOTORPOLES = 253,
-            HALLINV,
-            ENDRIVER
+            HALLINVERT,
+            ENABLEDRIVER
         };
 
-    public:
+        /* Constructor */
+
         TMCM16XX();
-        void debug();
 
-        /* HIGH LEVEL FUNCTIONS */
+        /* Decode Functions */
 
-        const unsigned char* setRotateRight(int velocity);
-        const unsigned char* setRotateLeft(int velocity);
-        const unsigned char* setMoveAbs(int position);
-        const unsigned char* setMoveRel(int offset);
+        const int* decodeReceive(const char*);
+
+        /* High Level Functions */
+
+        const unsigned char* setRotateRight(int);
+        const unsigned char* setRotateLeft(int);
+        const unsigned char* setMoveAbs(int);
+        const unsigned char* setMoveRel(int);
         const unsigned char* setStop();
 
-        /* PARAMETER FUNCTIONS */
+        /* Parameter Functions */
 
-        const unsigned char* setAxisParameter(int type, int value);
-        const unsigned char* getAxisParameter(int type);
-        const unsigned char* saveAxisParameter(int type);
-        const unsigned char* loadAxisParameter(int type);
-        const unsigned char* setGlobalParameter(int type, int value);
-        const unsigned char* getGlobalParameter(int type);
-        const unsigned char* saveGlobalParameter(int type);
-        const unsigned char* loadGlobalParameter(int type);
+        const unsigned char* setAxisParameter(int, int);
+        const unsigned char* getAxisParameter(int);
+        const unsigned char* saveAxisParameter(int);
+        const unsigned char* loadAxisParameter(int);
+        const unsigned char* setGlobalParameter(int, int);
+        const unsigned char* getGlobalParameter(int);
+        const unsigned char* saveGlobalParameter(int);
+        const unsigned char* loadGlobalParameter(int);
 
-        /* CURRENT FUNCTIONS */
+        /* Current Functions */
 
-        const unsigned char* setCurrentMax(int value);
-        const unsigned char* setCurrent(int value);
+        const unsigned char* setCurrentMax(int);
+        const unsigned char* setCurrent(int);
         const unsigned char* getCurrent();
-        const unsigned char* setCurrentPidDelay(int value);
-        const unsigned char* setCurrentP(int value);
-        const unsigned char* setCurrentI(int value);
+        const unsigned char* setCurrentPidDelay(int);
+        const unsigned char* setCurrentP(int);
+        const unsigned char* setCurrentI(int);
         const unsigned char* getCurrentPidError();
         const unsigned char* getCurrentPidErrorSum();
-
 
 };
 
