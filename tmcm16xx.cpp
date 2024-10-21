@@ -1,12 +1,11 @@
 // ################################################################################
 // #                                                                              #
 // #                         TMCM 16XX BLDC DRIVER LIBRARY                        #
-// #                                      BY                                      #
-// #                                   GELUDWIG                                   #
+// #                                      by                                      #
+// #                                 Georg Ludwig                                 #
 // #                         https://github.com/geludwig/                         #
 // #                                                                              #
 // ################################################################################
-
 
 /* Example Init Pseudocode
 
@@ -16,6 +15,7 @@
     const unsigned char* command;
 
     command = tmcm.setCurrentParameter(tmcm.CURRENTTARGET, 100);
+    
     serial.write(command, 9);
 
 */
@@ -54,6 +54,13 @@ void TMCM16XX::calcValueChecksum(int value) {
 // #                                                                              #
 // ################################################################################
 
+/* Constructor */
+TMCM16XX::TMCM16XX() {
+    for (int i = 0; i < 9; i++) {
+        cmd[i] = 0;
+    }
+}
+
 /*  Decode Receive Message.
     arg: unsigned char[9]
     ret: signed char[5] = {receive address, module address, status, command, value}
@@ -78,7 +85,10 @@ const int* TMCM16XX::decodeReceive(const char *value) {
     rec[3] = value[3];  // 3 last command
 
     /* cast 2 signed values to single integer */
-    rec[4] = ((value[4] & 0xFF) << 24) | ((value[5] & 0xFF)  << 16) | ((value[6] & 0xFF) << 8) | (value[7] & 0xFF);
+    rec[4] = ((value[4] & 0xFF) << 24) |
+             ((value[5] & 0xFF)  << 16) |
+             ((value[6] & 0xFF) << 8) |
+             (value[7] & 0xFF);
 
     #ifdef DEBUG
     printf("[4] hex %x\n", value[4]);
@@ -193,13 +203,6 @@ const unsigned char* TMCM16XX::loadGlobalParameter(int type) {
 // #                                                                              #
 // ################################################################################
 
-/* Initialize TMCM16XX */
-TMCM16XX::TMCM16XX() {
-    for (int i = 0; i < 9; i++) {
-        cmd[i] = 0;
-    }
-}
-
 /*  Rotate Right.
     arg:    int velocity
     ret:    unsigned char[9]
@@ -261,6 +264,7 @@ const unsigned char* TMCM16XX::setMoveRel(int value) {
 /*  Set Current Parameter.
     arg:    int parameter, int value
     ret:    unsigned char[9]
+    Note:   CURRENTGET* parameters are read only!
 */
 const unsigned char* TMCM16XX::setCurrentParameter(CurrentParameter type, int value) {
     setAxisParameter(type, value);
@@ -285,6 +289,7 @@ const unsigned char* TMCM16XX::getCurrentParameter(CurrentParameter type) {
 /*  Set Velocity Parameter.
     arg:    int parameter, int value
     ret:    unsigned char[9]
+    Note:   VELOCITYGET* parameters are read only!
 */
 const unsigned char* TMCM16XX::setVelocityParameter(VelocityParameter type, int value) {
     setAxisParameter(type, value);
