@@ -1,8 +1,42 @@
+// ################################################################################
+// #                                                                              #
+// #                         TMCM 16XX BLDC DRIVER LIBRARY                        #
+// #                                      BY                                      #
+// #                                   GELUDWIG                                   #
+// #                         https://github.com/geludwig/                         #
+// #                                                                              #
+// ################################################################################
+
+/* Libary Manual
+
+    Set motor axis commands either by setAxisParameter(type, value) or
+    directly use available current/velocity/... functions.
+
+    Axis Parameters listed under "enum parameter {}".
+
+*/
+
+
+/* Example Init Pseudocode
+
+    TMCM16XX tmcm;
+    TMCM16XX();
+
+    const unsigned char* command;
+
+    serial.write(tmcm.setRotateRight(500), 9);
+
+    command = tmcm.setRotateRight(500);
+    serial.write(command, 9);
+*/
+
 
 //#define DEBUG
+#ifdef DEBUG
+#include <stdio.h>
+#endif
 
 #include "tmcm16xx.h"
-#include <stdio.h>
 
 // ################################################################################
 // #                                                                              #
@@ -68,71 +102,6 @@ const int* TMCM16XX::decodeReceive(const char *value) {
     #endif
 
     return rec;
-}
-
-// ################################################################################
-// #                                                                              #
-// #                                MOVE FUNCTIONS                                #
-// #                                                                              #
-// ################################################################################
-
-/* Initialize TMCM16XX */
-TMCM16XX::TMCM16XX() {
-    for (int i = 0; i < 9; i++) {
-        cmd[i] = 0;
-    }
-}
-
-/*  Rotate Right.
-    arg:    int velocity
-    ret:    unsigned char[9]
-*/
-const unsigned char* TMCM16XX::setRotateRight(int value) {
-    cmd[1] = ROR;
-    calcValueChecksum(value);
-    return cmd;
-}
-
-/*  Rotate Left.
-    arg:    int velocity
-    ret:    unsigned char[9]
-*/
-const unsigned char* TMCM16XX::setRotateLeft(int value) {
-    cmd[1] = ROL;
-    calcValueChecksum(value);
-    return cmd;
-}
-
-/*  Stop rotation.
-    arg:    na
-    ret:    unsigned char[9]
-*/
-const unsigned char* TMCM16XX::setStop() {
-    cmd[1] = MST;
-    calcValueChecksum(0);
-    return cmd;
-}
-
-/*  Move Absolute.
-    arg:    int position
-    ret:    unsigned char[9]
-*/
-const unsigned char* TMCM16XX::setMoveAbs(int value) {
-    cmd[1] = MVP;
-    cmd[1] = ABS;
-    calcValueChecksum(value);
-    return cmd;
-}
-
-/*  Move Relative.
-    arg:    int offset
-    ret:    unsigned char[9]
-*/
-const unsigned char* TMCM16XX::setMoveRel(int value) {
-    cmd[1] = MVP;
-    cmd[2] = REL;
-    calcValueChecksum(value);
-    return cmd;
 }
 
 // ################################################################################
@@ -226,6 +195,71 @@ const unsigned char* TMCM16XX::loadGlobalParameter(int type) {
     cmd[1] = RSGP;
     cmd[2] = type;
     calcValueChecksum(0);
+    return cmd;
+}
+
+// ################################################################################
+// #                                                                              #
+// #                                MOVE FUNCTIONS                                #
+// #                                                                              #
+// ################################################################################
+
+/* Initialize TMCM16XX */
+TMCM16XX::TMCM16XX() {
+    for (int i = 0; i < 9; i++) {
+        cmd[i] = 0;
+    }
+}
+
+/*  Rotate Right.
+    arg:    int velocity
+    ret:    unsigned char[9]
+*/
+const unsigned char* TMCM16XX::setMoveRotateRight(int value) {
+    cmd[1] = ROR;
+    calcValueChecksum(value);
+    return cmd;
+}
+
+/*  Rotate Left.
+    arg:    int velocity
+    ret:    unsigned char[9]
+*/
+const unsigned char* TMCM16XX::setMoveRotateLeft(int value) {
+    cmd[1] = ROL;
+    calcValueChecksum(value);
+    return cmd;
+}
+
+/*  Stop rotation.
+    arg:    na
+    ret:    unsigned char[9]
+*/
+const unsigned char* TMCM16XX::setStop() {
+    cmd[1] = MST;
+    calcValueChecksum(0);
+    return cmd;
+}
+
+/*  Move Absolute.
+    arg:    int position
+    ret:    unsigned char[9]
+*/
+const unsigned char* TMCM16XX::setMoveAbs(int value) {
+    cmd[1] = MVP;
+    cmd[1] = ABS;
+    calcValueChecksum(value);
+    return cmd;
+}
+
+/*  Move Relative.
+    arg:    int offset
+    ret:    unsigned char[9]
+*/
+const unsigned char* TMCM16XX::setMoveRel(int value) {
+    cmd[1] = MVP;
+    cmd[2] = REL;
+    calcValueChecksum(value);
     return cmd;
 }
 

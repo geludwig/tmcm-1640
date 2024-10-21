@@ -1,3 +1,12 @@
+// ################################################################################
+// #                                                                              #
+// #                         TMCM 16XX BLDC DRIVER LIBRARY                        #
+// #                                      BY                                      #
+// #                                   GELUDWIG                                   #
+// #                         https://github.com/geludwig/                         #
+// #                                                                              #
+// ################################################################################
+
 #ifndef TMCM16XX_H
 #define TMCM16XX_H
 
@@ -111,14 +120,6 @@ class TMCM16XX {
 
         const int* decodeReceive(const char*);
 
-        /* Move Functions */
-
-        const unsigned char* setRotateRight(int);
-        const unsigned char* setRotateLeft(int);
-        const unsigned char* setMoveAbs(int);
-        const unsigned char* setMoveRel(int);
-        const unsigned char* setStop();
-
         /* Parameter Functions */
 
         const unsigned char* setAxisParameter(int, int);
@@ -129,6 +130,14 @@ class TMCM16XX {
         const unsigned char* getGlobalParameter(int);
         const unsigned char* saveGlobalParameter(int);
         const unsigned char* loadGlobalParameter(int);
+
+        /* Move Functions */
+
+        const unsigned char* setMoveRotateRight(int);
+        const unsigned char* setMoveRotateLeft(int);
+        const unsigned char* setMoveAbs(int);
+        const unsigned char* setMoveRel(int);
+        const unsigned char* setStop();
 
         /* Current Functions */
 
