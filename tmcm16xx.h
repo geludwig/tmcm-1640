@@ -18,7 +18,7 @@ class TMCM16XX {
 
     public:
         /* Command list */
-        enum command {
+        enum Command {
             ROR = 1,
             ROL,
             MST,
@@ -45,71 +45,59 @@ class TMCM16XX {
             AAP,
             AGP
         };
-
-        /* Type list for MVP command */
-        enum mvp {
+        
+        /* Move Parameter */
+        enum Mvp {
             ABS,
             REL
         };
 
-        /* Type list for SAP, GAP, STAP, RSAP, AAP commands */
-        enum parameter {
-            TARGETPOS,
-            ACTUALPOS,
-            TARGETVELOCITY,
-            ACTUALVELOCITY,
-            MAXRAMPVELOCITY,
-            MAXCURRENT = 6,
-            TARGETVELOCITYFLAG,
+        /* Module Parameter */
+        enum ModuleParameter {
+
+        };
+
+        /* Encoder parameter */
+        enum EncoderParameter {
+
+        };
+
+        /* Current Parameter */
+        enum CurrentParameter {
+            CURRENTMAX = 6,
+            CURRENTD = 134,
+            CURRENTGETACTUAL = 150,
+            CURRENTTARGET = 155,
+            CURRENTP = 172,
+            CURRENTI,
+            CURRENTGETERROR = 200,
+            CURRENTGETERRORSUM
+        };
+
+        /* Velocity Parameter */
+        enum VelocityParameter {
+            VELOCITYTARGET = 2,
+            VELOCITYGETACTUAL,
+            VELOCITYRAMPMAX,
             VELOCITYHALTFLAG = 9,
-            TARGETREACHDISTANCE,
-            ACCELERATIONVELOCITY,
-            RAMPGENERATORSPEED = 13,
-            THERMALWINDINGTIME = 25,
-            I2TLIMIT,
-            I2TSUM,
-            I2TEXCEEDCOUNTER,
-            I2TCLEARFLAG,
-            MINUTECOUNTER,
-            BLDCINIT,
-            DVELOCITY = 133,
-            DCURRENT,
-            ENABLEVELOCITYRAMP = 146,
-            ACTUALCURRENT = 150,
-            SUPPLYVOLTAGE,
-            TEMP,
-            TARGETCURRENT = 155,
-            ERRORFLAGS,
-            COMMUTATIONMODE = 159,
-            ENCODERSETNULL = 161,
-            SWITCHSETNULL,
-            ENCODERCLEAR,
-            STOPSWITCH,
-            ENCODEROFFSET,
-            STOPSWITCHPOLARITY,
-            PCURRENT = 172,
-            ICURRENT,
-            STARTCURRENT = 177,
-            PIDCURRENTERROR = 200,
-            PIDCURRENTERRORSUM,
-            HALLANGLE = 210,
-            ENCODERANGLE,
-            CONTROLANGLE,
-            PIDPOSITIONERROR = 226,
-            PIDVELOCITYERROR = 228,
-            PIDVELOCITYERRORSUM,
-            PPOSITION,
-            PVELOCITY = 234,
-            IVELOCITY,
-            SINEINITSPEED = 241,
-            SINEINITDELAY = 244,
-            OVERVOLTAGEPROT,
-            INITSINEMODE = 249,
-            ENCODERSTEPS,
-            ENCODERDIR,
-            MOTORPOLES = 253,
-            HALLINVERT,
-            ENABLEDRIVER
+            VELOCITYACCELERATION = 11,
+            VELOCITYGETRAMPACTUAL = 13,
+            VELOCITYD = 133,
+            VELOCITYRAMPENABLE = 146,
+            VELOCITYGETERROR = 228,
+            VELOCITYGETERRORSUM,
+            VELOCITYP = 234,
+            VELOCITYI
+        };
+
+        /* Position Parameter */
+        enum PositionParameter {
+
+        };
+
+        /* Status Parameter */
+        enum StatusParameter {
+
         };
 
         /* Constructor */
@@ -141,29 +129,13 @@ class TMCM16XX {
 
         /* Current Functions */
 
-        const unsigned char* setCurrentMax(int);
-        const unsigned char* setCurrent(int);
-        const unsigned char* getCurrent();
-        const unsigned char* setCurrentD(int);
-        const unsigned char* setCurrentP(int);
-        const unsigned char* setCurrentI(int);
-        const unsigned char* getCurrentError();
-        const unsigned char* getCurrentErrorSum();
+        const unsigned char* setCurrentParameter(CurrentParameter, int);
+        const unsigned char* getCurrentParameter(CurrentParameter);
 
         /* Velocity Functions */
 
-        const unsigned char* setVelocity(int);
-        const unsigned char* getVelocity();
-        const unsigned char* setVelocityHaltFlag(int);
-        const unsigned char* setVelocityD(int);
-        const unsigned char* setVelocityP(int);
-        const unsigned char* setVelocityI(int);
-        const unsigned char* getVelocityError();
-        const unsigned char* getVelocityErrorSum();
-        const unsigned char* setVelocityRampMax(int);
-        const unsigned char* setVelocityAcceleration(int);
-        const unsigned char* getVelocityRamp();
-        const unsigned char* setVelocityRampEnable(int);
+        const unsigned char* setVelocityParameter(VelocityParameter, int);
+        const unsigned char* getVelocityParameter(VelocityParameter);
 };
 
 #endif
