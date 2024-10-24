@@ -8,22 +8,24 @@
 // ################################################################################
 
 /* Example Init Pseudocode
-
     TMCM16XX tmcm;
     TMCM16XX();
 
-    const unsigned char* command;
-
-    command = tmcm.setCurrentParameter(tmcm.CURRENTTARGET, 100);
+    const unsigned char* send;
+    send = tmcm.initCommand(tmcm.SAP, tmcm.CURRENTTARGET, 100); // SetAxisParameter with CurrentTarget to 100mA. Or use:
+    send = tmcm.setAxisParameter(tmcm.CURRENTTARGET, 100);      // Same command, but one abstraction layer higher.
     
     serial.write(command, 9);
-
 */
 
-//#define DEBUG
-#ifdef DEBUG
-#include <stdio.h>
-#endif
+/* Functions tree
+.
+├── Constructor
+├── Decode Functions
+├── Command Functions
+│   ├── Parameter Functions
+│   ├── Move Functions
+*/
 
 #include "tmcm16xx.h"
 
@@ -50,7 +52,7 @@ void TMCM16XX::calcValueChecksum(int value) {
 
 // ################################################################################
 // #                                                                              #
-// #                               DECODE FUNCTIONS                               #
+// #                                 CONSTRUCTOR                                  #
 // #                                                                              #
 // ################################################################################
 
@@ -61,9 +63,15 @@ TMCM16XX::TMCM16XX() {
     }
 }
 
+// ################################################################################
+// #                                                                              #
+// #                               DECODE FUNCTIONS                               #
+// #                                                                              #
+// ################################################################################
+
 /*  Decode Receive Message.
     arg: unsigned char[9]
-    ret: signed char[5] = {receive address, module address, status, command, value}
+    ret: signed int[5] = {receive address, module address, status, command, value}
 */
 const int* TMCM16XX::decodeReceive(const char *value) {    
     /* calc checksum */
@@ -90,17 +98,24 @@ const int* TMCM16XX::decodeReceive(const char *value) {
              ((value[6] & 0xFF) << 8) |
              (value[7] & 0xFF);
 
-    #ifdef DEBUG
-    printf("[4] hex %x\n", value[4]);
-    printf("[5] hex %x\n", value[5]);
-    printf("[6] hex %x\n", value[6]);
-    printf("[7] hex %x\n", value[7]);
-
-    printf("rec hex %x\n", rec[4]);
-    printf("rec int %i\n", rec[4]);
-    #endif
-
     return rec;
+}
+
+// ################################################################################
+// #                                                                              #
+// #                              COMMAND FUNCTIONS                               #
+// #                                                                              #
+// ################################################################################
+
+/*  Description.
+    arg:    enum Commands, enum Types, optional: int value
+    ret:    unsigned char[9]
+*/
+const unsigned char* TMCM16XX::initCommand(Commands command, int type, int value = 0) {
+    cmd[1] = command;
+    cmd[2] = type;
+    calcValueChecksum(value);
+    return cmd;
 }
 
 // ################################################################################
@@ -110,90 +125,74 @@ const int* TMCM16XX::decodeReceive(const char *value) {
 // ################################################################################
 
 /*  Set Axis Parameter.
-    arg:    int type, int value
+    arg:    enum Types, int value
     ret:    unsigned char[9]
 */
-const unsigned char* TMCM16XX::setAxisParameter(int type, int value) {
-    cmd[1] = SAP;
-    cmd[2] = type;
-    calcValueChecksum(value);
+const unsigned char* TMCM16XX::setAxisParameter(Types type, int value) {
+    initCommand(SAP, type, value);
     return cmd;
 }
 
 /*  Get Axis Parameter.
-    arg:    int type
+    arg:    enum Types
     ret:    unsigned char[9]
 */
-const unsigned char* TMCM16XX::getAxisParameter(int type) {
-    cmd[1] = GAP;
-    cmd[2] = type;
-    calcValueChecksum(0);
+const unsigned char* TMCM16XX::getAxisParameter(Types type) {
+    initCommand(GAP, type);
     return cmd;
 }
 
 /*  Store Axis Parameter previously set.
-    arg:    int type
+    arg:    enum Types
     ret:    unsigned char[9]
 */
-const unsigned char* TMCM16XX::saveAxisParameter(int type) {
-    cmd[1] = STAP;
-    cmd[2] = type;
-    calcValueChecksum(0);
+const unsigned char* TMCM16XX::saveAxisParameter(Types type) {
+    initCommand(STAP, type);
     return cmd;
 }
 
 /*  Load Axis Parameter previously set.
-    arg:    int type
+    arg:    enum Types
     ret:    unsigned char[9]
 */
-const unsigned char* TMCM16XX::loadAxisParameter(int type) {
-    cmd[1] = RSAP;
-    cmd[2] = type;
-    calcValueChecksum(0);
+const unsigned char* TMCM16XX::loadAxisParameter(Types type) {
+    initCommand(RSAP, type);
     return cmd;
 }
 
 /*  Set Global Parameter.
-    arg:    int type, int value
+    arg:    enum Types, int value
     ret:    unsigned char[9]
 */
-const unsigned char* TMCM16XX::setGlobalParameter(int type, int value) {
-    cmd[1] = SGP;
-    cmd[2] = type;
-    calcValueChecksum(value);
+const unsigned char* TMCM16XX::setGlobalParameter(Types type, int value) {
+    initCommand(SGP, type, value);
     return cmd;
 }
 
 /*  Get Global Parameter.
-    arg:    int type
+    arg:    enum Types
     ret:    unsigned char[9]
 */
-const unsigned char* TMCM16XX::getGlobalParameter(int type) {
-    cmd[1] = GGP;
-    cmd[2] = type;
-    calcValueChecksum(0);
+const unsigned char* TMCM16XX::getGlobalParameter(Types type) {
+    initCommand(GGP, type);
     return cmd;
 }
 
 /*  Store Global Parameter.
-    arg:    int type
+    arg:    enum Types
     ret:    unsigned char[9]
 */
-const unsigned char* TMCM16XX::saveGlobalParameter(int type) {
-    cmd[1] = STGP;
-    cmd[2] = type;
-    calcValueChecksum(0);
+const unsigned char* TMCM16XX::saveGlobalParameter(Types type) {
+    initCommand(STGP, type);
     return cmd;
 }
 
 /*  Load Global Parameter.
-    arg:    int type
+    arg:    enum Types
     ret:    unsigned char[9]
 */
-const unsigned char* TMCM16XX::loadGlobalParameter(int type) {
-    cmd[1] = RSGP;
-    cmd[2] = type;
-    calcValueChecksum(0);
+const unsigned char* TMCM16XX::loadGlobalParameter(Types type) {
+    initCommand(RSGP, type);
     return cmd;
 }
 
@@ -208,8 +207,7 @@ const unsigned char* TMCM16XX::loadGlobalParameter(int type) {
     ret:    unsigned char[9]
 */
 const unsigned char* TMCM16XX::setMoveRotateRight(int value) {
-    cmd[1] = ROR;
-    calcValueChecksum(value);
+    initCommand(ROR, 0, value);
     return cmd;
 }
 
@@ -218,8 +216,7 @@ const unsigned char* TMCM16XX::setMoveRotateRight(int value) {
     ret:    unsigned char[9]
 */
 const unsigned char* TMCM16XX::setMoveRotateLeft(int value) {
-    cmd[1] = ROL;
-    calcValueChecksum(value);
+    initCommand(ROL, 0, value);
     return cmd;
 }
 
@@ -228,8 +225,7 @@ const unsigned char* TMCM16XX::setMoveRotateLeft(int value) {
     ret:    unsigned char[9]
 */
 const unsigned char* TMCM16XX::setStop() {
-    cmd[1] = MST;
-    calcValueChecksum(0);
+    initCommand(MST, 0);
     return cmd;
 }
 
@@ -238,9 +234,7 @@ const unsigned char* TMCM16XX::setStop() {
     ret:    unsigned char[9]
 */
 const unsigned char* TMCM16XX::setMoveAbs(int value) {
-    cmd[1] = MVP;
-    cmd[1] = ABS;
-    calcValueChecksum(value);
+    initCommand(MVP, ABSOLUTE, value);
     return cmd;
 }
 
@@ -249,58 +243,6 @@ const unsigned char* TMCM16XX::setMoveAbs(int value) {
     ret:    unsigned char[9]
 */
 const unsigned char* TMCM16XX::setMoveRel(int value) {
-    cmd[1] = MVP;
-    cmd[2] = REL;
-    calcValueChecksum(value);
-    return cmd;
-}
-
-// ################################################################################
-// #                                                                              #
-// #                             CURRENT FUNCTIONS                                #
-// #                                                                              #
-// ################################################################################
-
-/*  Set Current Parameter.
-    arg:    int parameter, int value
-    ret:    unsigned char[9]
-    Note:   CURRENTGET* parameters are read only!
-*/
-const unsigned char* TMCM16XX::setCurrentParameter(CurrentParameter type, int value) {
-    setAxisParameter(type, value);
-    return cmd;
-}
-
-/*  Get Current Parameter.
-    arg:    int value
-    ret:    unsigned char[9]
-*/
-const unsigned char* TMCM16XX::getCurrentParameter(CurrentParameter type) {
-    getAxisParameter(type);
-    return cmd;
-}
-
-// ################################################################################
-// #                                                                              #
-// #                            VELOCITY FUNCTIONS                                #
-// #                                                                              #
-// ################################################################################
-
-/*  Set Velocity Parameter.
-    arg:    int parameter, int value
-    ret:    unsigned char[9]
-    Note:   VELOCITYGET* parameters are read only!
-*/
-const unsigned char* TMCM16XX::setVelocityParameter(VelocityParameter type, int value) {
-    setAxisParameter(type, value);
-    return cmd;
-}
-
-/*  Get Velocity Parameter.
-    arg:    int value
-    ret:    unsigned char[9]
-*/
-const unsigned char* TMCM16XX::getVelocityParameter(VelocityParameter type) {
-    getAxisParameter(type);
+    initCommand(MVP, RELATIVE, value);
     return cmd;
 }

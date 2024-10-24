@@ -17,8 +17,8 @@ class TMCM16XX {
         void calcValueChecksum(int value);
 
     public:
-        /* Command list */
-        enum Command {
+        /* Commands */
+        enum Commands {
             ROR = 1,
             ROL,
             MST,
@@ -45,59 +45,36 @@ class TMCM16XX {
             AAP,
             AGP
         };
-        
-        /* Move Parameter */
-        enum Mvp {
-            ABS,
-            REL
-        };
 
-        /* Module Parameter */
-        enum ModuleParameter {
-
-        };
-
-        /* Encoder parameter */
-        enum EncoderParameter {
-
-        };
-
-        /* Current Parameter */
-        enum CurrentParameter {
+        /* Types */
+        enum Types {
+            VELOCITYTARGET = 2,
+            VELOCITYGETACTUAL,
+            VELOCITYRAMPMAX,
             CURRENTMAX = 6,
+            VELOCITYHALTFLAG = 9,
+            VELOCITYACCELERATION = 11,
+            VELOCITYGETRAMPACTUAL = 13,
+            VELOCITYD = 133,
             CURRENTD = 134,
+            VELOCITYRAMPENABLE = 146,
             CURRENTGETACTUAL = 150,
             CURRENTTARGET = 155,
             CURRENTP = 172,
             CURRENTI,
             CURRENTGETERROR = 200,
-            CURRENTGETERRORSUM
-        };
-
-        /* Velocity Parameter */
-        enum VelocityParameter {
-            VELOCITYTARGET = 2,
-            VELOCITYGETACTUAL,
-            VELOCITYRAMPMAX,
-            VELOCITYHALTFLAG = 9,
-            VELOCITYACCELERATION = 11,
-            VELOCITYGETRAMPACTUAL = 13,
-            VELOCITYD = 133,
-            VELOCITYRAMPENABLE = 146,
+            CURRENTGETERRORSUM,
             VELOCITYGETERROR = 228,
             VELOCITYGETERRORSUM,
             VELOCITYP = 234,
             VELOCITYI
         };
 
-        /* Position Parameter */
-        enum PositionParameter {
-
-        };
-
-        /* Status Parameter */
-        enum StatusParameter {
-
+        
+        /* Move Parameter */
+        enum TypesMove {
+            ABSOLUTE,
+            RELATIVE
         };
 
         /* Constructor */
@@ -108,16 +85,20 @@ class TMCM16XX {
 
         const int* decodeReceive(const char*);
 
+        /* Command Functions */
+
+        const unsigned char* initCommand(Commands, int, int);
+
         /* Parameter Functions */
 
-        const unsigned char* setAxisParameter(int, int);
-        const unsigned char* getAxisParameter(int);
-        const unsigned char* saveAxisParameter(int);
-        const unsigned char* loadAxisParameter(int);
-        const unsigned char* setGlobalParameter(int, int);
-        const unsigned char* getGlobalParameter(int);
-        const unsigned char* saveGlobalParameter(int);
-        const unsigned char* loadGlobalParameter(int);
+        const unsigned char* setAxisParameter(Types, int);
+        const unsigned char* getAxisParameter(Types);
+        const unsigned char* saveAxisParameter(Types);
+        const unsigned char* loadAxisParameter(Types);
+        const unsigned char* setGlobalParameter(Types, int);
+        const unsigned char* getGlobalParameter(Types);
+        const unsigned char* saveGlobalParameter(Types);
+        const unsigned char* loadGlobalParameter(Types);
 
         /* Move Functions */
 
@@ -126,16 +107,6 @@ class TMCM16XX {
         const unsigned char* setMoveAbs(int);
         const unsigned char* setMoveRel(int);
         const unsigned char* setStop();
-
-        /* Current Functions */
-
-        const unsigned char* setCurrentParameter(CurrentParameter, int);
-        const unsigned char* getCurrentParameter(CurrentParameter);
-
-        /* Velocity Functions */
-
-        const unsigned char* setVelocityParameter(VelocityParameter, int);
-        const unsigned char* getVelocityParameter(VelocityParameter);
 };
 
 #endif
