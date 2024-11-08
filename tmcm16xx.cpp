@@ -15,7 +15,7 @@
     send = tmcm.initCommand(tmcm.SAP, tmcm.CURRENTTARGET, 100); // SetAxisParameter with CurrentTarget to 100mA. Or use:
     send = tmcm.setAxisParameter(tmcm.CURRENTTARGET, 100);      // Same command, but one abstraction layer higher.
     
-    serial.write(command, 9);
+    serial.write(send, 9);
 */
 
 /* Functions tree
