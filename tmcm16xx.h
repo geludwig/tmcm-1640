@@ -55,6 +55,8 @@ class TMCM16XX {
             VELOCITYHALTFLAG = 9,
             VELOCITYACCELERATION = 11,
             VELOCITYGETRAMPACTUAL = 13,
+            RS485BAUDRATE = 65,
+            RS485PAUSE = 75,
             VELOCITYD = 133,
             CURRENTD = 134,
             VELOCITYRAMPENABLE = 146,
@@ -80,6 +82,7 @@ class TMCM16XX {
         /* Constructor */
 
         TMCM16XX();
+        void setSerialReceiveId(char);
 
         /* Decode Functions */
 

@@ -44,7 +44,7 @@ void TMCM16XX::calcValueChecksum(int value) {
     cmd[7] = value & 0xFF;
 
     unsigned char checksum = cmd[0];
-    for (int i = 1; i < 8; i++) {
+    for (char i = 1; i < 8; i++) {
         checksum += cmd[i];
     }
     cmd[8] = checksum;
@@ -58,9 +58,17 @@ void TMCM16XX::calcValueChecksum(int value) {
 
 /* Constructor */
 TMCM16XX::TMCM16XX() {
-    for (int i = 0; i < 9; i++) {
+    for (char i = 0; i < 9; i++) {
         cmd[i] = 0;
     }
+}
+
+/*  Set serial receive device id.
+    arg: 
+    ret: signed int[5] = {receive address, module address, status, command, value}
+*/
+void TMCM16XX::setSerialReceiveId(char value) {
+    cmd[0] = value;
 }
 
 // ################################################################################
@@ -70,10 +78,10 @@ TMCM16XX::TMCM16XX() {
 // ################################################################################
 
 /*  Decode Receive Message.
-    arg: unsigned char[9]
-    ret: signed int[5] = {receive address, module address, status, command, value}
+    arg: char[9]
+    ret: int[5] = {receive address, module address, status, command, value}
 */
-const int* TMCM16XX::decodeReceive(const char *value) {    
+const int* TMCM16XX::decodeReceive(const char *value) {
     /* calc checksum */
     char checksum = value[0];
     for (int i = 1; i < 8; i++) {
