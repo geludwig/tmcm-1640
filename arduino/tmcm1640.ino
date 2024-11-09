@@ -54,7 +54,6 @@ void loop() {
   delay(500);
   digitalWrite(ledPin, LOW);
   delay(2000);
-
 }
 
 // >> SEND RS485 MESSAGE
