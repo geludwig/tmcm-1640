@@ -10,11 +10,13 @@
 #ifndef TMCM16XX_H
 #define TMCM16XX_H
 
+#include <stdint.h>
+
 class TMCM16XX {
     private:
-        unsigned char cmd[9];
-        int rec[9];
-        void calcValueChecksum(int value);
+        uint8_t cmd[9];
+        int32_t rec[9];
+        void calcValueChecksum(int32_t value);
 
     public:
         /* Commands */
@@ -48,7 +50,8 @@ class TMCM16XX {
 
         /* Types */
         enum Types {
-            VELOCITYTARGET = 2,
+            POSITIONACTUAL = 1,
+            VELOCITYTARGET,
             VELOCITYGETACTUAL,
             VELOCITYRAMPMAX,
             CURRENTMAX = 6,
@@ -82,34 +85,34 @@ class TMCM16XX {
         /* Constructor */
 
         TMCM16XX();
-        void setSerialReceiveId(char);
+        void setSerialReceiveId(uint8_t);
 
         /* Decode Functions */
 
-        const int* decodeReceive(const char*);
+        const int32_t* decodeReceive(const uint8_t*);
 
         /* Command Functions */
 
-        const unsigned char* initCommand(Commands, int, int);
+        const uint8_t* initCommand(Commands, int32_t, int32_t);
 
         /* Parameter Functions */
 
-        const unsigned char* setAxisParameter(Types, int);
-        const unsigned char* getAxisParameter(Types);
-        const unsigned char* saveAxisParameter(Types);
-        const unsigned char* loadAxisParameter(Types);
-        const unsigned char* setGlobalParameter(Types, int);
-        const unsigned char* getGlobalParameter(Types);
-        const unsigned char* saveGlobalParameter(Types);
-        const unsigned char* loadGlobalParameter(Types);
+        const uint8_t* setAxisParameter(Types, int32_t);
+        const uint8_t* getAxisParameter(Types);
+        const uint8_t* saveAxisParameter(Types);
+        const uint8_t* loadAxisParameter(Types);
+        const uint8_t* setGlobalParameter(Types, int32_t);
+        const uint8_t* getGlobalParameter(Types);
+        const uint8_t* saveGlobalParameter(Types);
+        const uint8_t* loadGlobalParameter(Types);
 
         /* Move Functions */
 
-        const unsigned char* setMoveRotateRight(int);
-        const unsigned char* setMoveRotateLeft(int);
-        const unsigned char* setMoveAbs(int);
-        const unsigned char* setMoveRel(int);
-        const unsigned char* setStop();
+        const uint8_t* setMoveRotateRight(int32_t);
+        const uint8_t* setMoveRotateLeft(int32_t);
+        const uint8_t* setMoveAbs(int32_t);
+        const uint8_t* setMoveRel(int32_t);
+        const uint8_t* setStop();
 };
 
 #endif

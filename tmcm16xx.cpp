@@ -7,26 +7,6 @@
 // #                                                                              #
 // ################################################################################
 
-/* Example Init Pseudocode
-    TMCM16XX tmcm;
-    TMCM16XX();
-
-    const unsigned char* send;
-    send = tmcm.initCommand(tmcm.SAP, tmcm.CURRENTTARGET, 100); // SetAxisParameter with CurrentTarget to 100mA. Or use:
-    send = tmcm.setAxisParameter(tmcm.CURRENTTARGET, 100);      // Same command, but one abstraction layer higher.
-    
-    serial.write(send, 9);
-*/
-
-/* Functions tree
-.
-├── Constructor
-├── Decode Functions
-├── Command Functions
-│   ├── Parameter Functions
-│   ├── Move Functions
-*/
-
 #include "tmcm16xx.h"
 
 // ################################################################################
@@ -36,15 +16,15 @@
 // ################################################################################
 
 /*  Calculate Value And Checksum :
-    int value */
-void TMCM16XX::calcValueChecksum(int value) {
+    int32_t value */
+void TMCM16XX::calcValueChecksum(int32_t value) {
     cmd[4] = (value >> 24) & 0xFF;
     cmd[5] = (value >> 16) & 0xFF;
     cmd[6] = (value >> 8) & 0xFF;
     cmd[7] = value & 0xFF;
 
-    unsigned char checksum = cmd[0];
-    for (char i = 1; i < 8; i++) {
+    uint8_t checksum = cmd[0];
+    for (int8_t i = 1; i < 8; i++) {
         checksum += cmd[i];
     }
     cmd[8] = checksum;
@@ -58,16 +38,16 @@ void TMCM16XX::calcValueChecksum(int value) {
 
 /* Constructor */
 TMCM16XX::TMCM16XX() {
-    for (char i = 0; i < 9; i++) {
+    for (int8_t i = 0; i < 9; i++) {
         cmd[i] = 0;
     }
 }
 
 /*  Set serial receive device id.
-    arg: 
-    ret: signed int[5] = {receive address, module address, status, command, value}
+    arg: uint8_t
+    ret: signed int32_t[5] = {receive address, module address, status, command, value}
 */
-void TMCM16XX::setSerialReceiveId(char value) {
+void TMCM16XX::setSerialReceiveId(uint8_t value) {
     cmd[0] = value;
 }
 
@@ -78,18 +58,18 @@ void TMCM16XX::setSerialReceiveId(char value) {
 // ################################################################################
 
 /*  Decode Receive Message.
-    arg: char[9]
-    ret: int[5] = {receive address, module address, status, command, value}
+    arg: uint8_t[9]
+    ret: int32_t[5] = {receive address, module address, status, command, value}
 */
-const int* TMCM16XX::decodeReceive(const char *value) {
+const int32_t* TMCM16XX::decodeReceive(const uint8_t* value) {
     /* calc checksum */
-    char checksum = value[0];
-    for (int i = 1; i < 8; i++) {
+    uint8_t checksum = value[0];
+    for (int8_t i = 1; i < 8; i++) {
         checksum += value[i];
     }
     /* return empty array when checksum check failed */
     if (checksum != value[8]) {
-        for (int i = 0; i < 9; i++) {
+        for (int8_t i = 0; i < 9; i++) {
             rec[i] = 0;
         }
         return rec;
@@ -100,11 +80,11 @@ const int* TMCM16XX::decodeReceive(const char *value) {
     rec[2] = value[2];  // 2 status
     rec[3] = value[3];  // 3 last command
 
-    /* cast 2 signed values to single integer */
-    rec[4] = ((value[4] & 0xFF) << 24) |
-             ((value[5] & 0xFF)  << 16) |
-             ((value[6] & 0xFF) << 8) |
-             (value[7] & 0xFF);
+    /* cast hex values to single integer */
+    rec[4] = ((uint32_t)(value[4] & 0xFF) << 24) |
+             ((uint32_t)(value[5] & 0xFF) << 16) |
+             ((uint32_t)(value[6] & 0xFF) << 8) |
+             ((uint32_t)value[7] & 0xFF);
 
     return rec;
 }
@@ -117,9 +97,9 @@ const int* TMCM16XX::decodeReceive(const char *value) {
 
 /*  Description.
     arg:    enum Commands, enum Types, optional: int value
-    ret:    unsigned char[9]
+    ret:    uint8_t[9]
 */
-const unsigned char* TMCM16XX::initCommand(Commands command, int type, int value = 0) {
+const uint8_t* TMCM16XX::initCommand(Commands command, int32_t type, int32_t value = 0) {
     cmd[1] = command;
     cmd[2] = type;
     calcValueChecksum(value);
@@ -133,73 +113,73 @@ const unsigned char* TMCM16XX::initCommand(Commands command, int type, int value
 // ################################################################################
 
 /*  Set Axis Parameter.
-    arg:    enum Types, int value
-    ret:    unsigned char[9]
+    arg:    enum Types, int32_t value
+    ret:    uint8_t[9]
 */
-const unsigned char* TMCM16XX::setAxisParameter(Types type, int value) {
+const uint8_t* TMCM16XX::setAxisParameter(Types type, int32_t value) {
     initCommand(SAP, type, value);
     return cmd;
 }
 
 /*  Get Axis Parameter.
     arg:    enum Types
-    ret:    unsigned char[9]
+    ret:    uint8_t[9]
 */
-const unsigned char* TMCM16XX::getAxisParameter(Types type) {
+const uint8_t* TMCM16XX::getAxisParameter(Types type) {
     initCommand(GAP, type);
     return cmd;
 }
 
 /*  Store Axis Parameter previously set.
     arg:    enum Types
-    ret:    unsigned char[9]
+    ret:    uint8_t[9]
 */
-const unsigned char* TMCM16XX::saveAxisParameter(Types type) {
+const uint8_t* TMCM16XX::saveAxisParameter(Types type) {
     initCommand(STAP, type);
     return cmd;
 }
 
 /*  Load Axis Parameter previously set.
     arg:    enum Types
-    ret:    unsigned char[9]
+    ret:    uint8_t[9]
 */
-const unsigned char* TMCM16XX::loadAxisParameter(Types type) {
+const uint8_t* TMCM16XX::loadAxisParameter(Types type) {
     initCommand(RSAP, type);
     return cmd;
 }
 
 /*  Set Global Parameter.
-    arg:    enum Types, int value
-    ret:    unsigned char[9]
+    arg:    enum Types, int32_t value
+    ret:    uint8_t[9]
 */
-const unsigned char* TMCM16XX::setGlobalParameter(Types type, int value) {
+const uint8_t* TMCM16XX::setGlobalParameter(Types type, int32_t value) {
     initCommand(SGP, type, value);
     return cmd;
 }
 
 /*  Get Global Parameter.
     arg:    enum Types
-    ret:    unsigned char[9]
+    ret:    uint8_t[9]
 */
-const unsigned char* TMCM16XX::getGlobalParameter(Types type) {
+const uint8_t* TMCM16XX::getGlobalParameter(Types type) {
     initCommand(GGP, type);
     return cmd;
 }
 
 /*  Store Global Parameter.
     arg:    enum Types
-    ret:    unsigned char[9]
+    ret:    uint8_t[9]
 */
-const unsigned char* TMCM16XX::saveGlobalParameter(Types type) {
+const uint8_t* TMCM16XX::saveGlobalParameter(Types type) {
     initCommand(STGP, type);
     return cmd;
 }
 
 /*  Load Global Parameter.
     arg:    enum Types
-    ret:    unsigned char[9]
+    ret:    uint8_t[9]
 */
-const unsigned char* TMCM16XX::loadGlobalParameter(Types type) {
+const uint8_t* TMCM16XX::loadGlobalParameter(Types type) {
     initCommand(RSGP, type);
     return cmd;
 }
@@ -211,46 +191,46 @@ const unsigned char* TMCM16XX::loadGlobalParameter(Types type) {
 // ################################################################################
 
 /*  Rotate Right.
-    arg:    int velocity
-    ret:    unsigned char[9]
+    arg:    int32_t velocity
+    ret:    uint8_t[9]
 */
-const unsigned char* TMCM16XX::setMoveRotateRight(int value) {
+const uint8_t* TMCM16XX::setMoveRotateRight(int32_t value) {
     initCommand(ROR, 0, value);
     return cmd;
 }
 
 /*  Rotate Left.
-    arg:    int velocity
-    ret:    unsigned char[9]
+    arg:    int32_t velocity
+    ret:    uint8_t[9]
 */
-const unsigned char* TMCM16XX::setMoveRotateLeft(int value) {
+const uint8_t* TMCM16XX::setMoveRotateLeft(int32_t value) {
     initCommand(ROL, 0, value);
     return cmd;
 }
 
 /*  Stop rotation.
     arg:    na
-    ret:    unsigned char[9]
+    ret:    uint8_t[9]
 */
-const unsigned char* TMCM16XX::setStop() {
+const uint8_t* TMCM16XX::setStop() {
     initCommand(MST, 0);
     return cmd;
 }
 
 /*  Move Absolute.
-    arg:    int position
-    ret:    unsigned char[9]
+    arg:    int32_t position
+    ret:    uint8_t[9]
 */
-const unsigned char* TMCM16XX::setMoveAbs(int value) {
+const uint8_t* TMCM16XX::setMoveAbs(int32_t value) {
     initCommand(MVP, ABSOLUTE, value);
     return cmd;
 }
 
 /*  Move Relative.
-    arg:    int offset
-    ret:    unsigned char[9]
+    arg:    int32_t offset
+    ret:    uint8_t[9]
 */
-const unsigned char* TMCM16XX::setMoveRel(int value) {
+const uint8_t* TMCM16XX::setMoveRel(int32_t value) {
     initCommand(MVP, RELATIVE, value);
     return cmd;
 }
