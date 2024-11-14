@@ -66,46 +66,23 @@ int main() {
         return 1;
     }
 
-    // Send TMCM command example
+    // TMCM 1640 example
     TMCM16XX tmcm;
     TMCM16XX();
 
-    const unsigned char* command = tmcm.setMoveRotateRight(100);
-    write(serial_port, command, 9);
+    // define sendBuf to get current encoder position
+    const uint8_t* sendBuf = tmcm.getAxisParameter(tmcm.POSITIONACTUAL);
 
-    printf("WRITE ------------------------\n");
-    printf("0 module address: %i\n", command[0]);
-    printf("1 command:        %i\n", command[1]);
-    printf("2 type:           %i\n", command[2]);
-    printf("3 bank:           %i\n", command[3]);
-    printf("4 value[0]        %i\n", command[4]);
-    printf("5 value[1]:       %i\n", command[5]);
-    printf("6 value[2]:       %i\n", command[6]);
-    printf("7 value[3]:       %i\n", command[7]);
-    printf("8 checksum:       %i\n", command[8]);
-    sleep(1);
+    // send serial
+    uint8_t readBuf[9];
+    write(serial_port, sendBuf, 9);
 
-    // Allocate memory for read buffer, set size according to your needs
-    char read_buf [9];
+    // read serial
+    read(serial_port, &readBuf, sizeof(readBuf));
 
-    // Read bytes.
-    int num_bytes = read(serial_port, &read_buf, sizeof(read_buf));
-
-    // n is the number of bytes read. n may be 0 if no bytes were received, and can also be -1 to signal an error.
-    if (num_bytes < 0) {
-        printf("Error reading: %s", strerror(errno));
-        return 1;
-    }
-
-    // Print TMCM receive message
-    const signed int* rec = tmcm.decodeReceive(read_buf);
-    printf("READ ------------------------\n");
-    printf("Received %i bytes\n", num_bytes);
-    printf("0 address   : %i\n", rec[0]);
-    printf("1 m address : %i\n", rec[1]);
-    printf("2 status    : %i\n", rec[2]);
-    printf("3 command   : %i\n", rec[3]);
-    printf("4 value     : %i\n", rec[4]);
+    // decode serial message and print value
+    const int32_t* recBuf = tmcm.decodeReceive(readBuf);
+    printf("value: %i\n", recBuf[4]);
 
     close(serial_port);
     return 0;
